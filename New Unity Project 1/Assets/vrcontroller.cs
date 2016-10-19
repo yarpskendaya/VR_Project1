@@ -78,7 +78,7 @@ public class vrcontroller : MonoBehaviour {
             hitObject.transform.position = transform.position + carryVector/* + new Vector3(0, 1, 0)*/;
             hitObject.transform.rotation = transform.rotation;
 
-            if (gripButtonDown)
+            if (gripButtonUp)
             {
                 carry = false;
                 Rigidbody hitObjectR = hitObject.GetComponent<Rigidbody>();
@@ -87,7 +87,7 @@ public class vrcontroller : MonoBehaviour {
             }
         }
 
-        if (gripButtonUp && !carry && bhit)
+        if (gripButtonDown && !carry && bhit)
         {
             hitObject = hit.collider.gameObject;
             if (hitObject.tag == "Grabable")
