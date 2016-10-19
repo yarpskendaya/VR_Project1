@@ -11,15 +11,23 @@ public class vrcontroller : MonoBehaviour {
     public bool triggerButtonDown = false;
     public bool triggerButtonUp = false;
     public bool triggerButtonPressed = false;
-
-
     private Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
-
     private SteamVR_Controller.Device controller { get { return SteamVR_Controller.Input((int)trackedObj.index); } }
     private SteamVR_TrackedObject trackedObj;
 
-	// Use this for initialization
-	void Start () {
+    [SerializeField]
+    RaycastHit hit;
+    public bool bhit;
+    [SerializeField]
+    GameObject hitObject;
+    Quaternion hitObjectRot;
+    [SerializeField]
+    bool carry = false;
+    [SerializeField]
+    Vector3 carryVector;
+
+    // Use this for initialization
+    void Start () {
 	    trackedObj = GetComponent<SteamVR_TrackedObject>();
 	}
 	
@@ -60,5 +68,36 @@ public class vrcontroller : MonoBehaviour {
             Debug.Log("triggerButton was just unpressed");
         }
 
-	}
+        
+        Ray raycast = new Ray(transform.position, transform.forward);
+        bhit = Physics.Raycast(raycast, out hit, 10.0f);
+
+        if (carry)
+        {
+            carryVector = transform.forward * 2;
+            hitObject.transform.position = transform.position + carryVector/* + new Vector3(0, 1, 0)*/;
+            hitObject.transform.rotation = transform.rotation;
+
+            if (gripButtonDown)
+            {
+                carry = false;
+                Rigidbody hitObjectR = hitObject.GetComponent<Rigidbody>();
+                Vector3 launchForce = transform.forward * 100;
+                hitObjectR.AddForce(launchForce, ForceMode.Impulse);
+            }
+        }
+
+        if (gripButtonUp && !carry && bhit)
+        {
+            hitObject = hit.collider.gameObject;
+            if (hitObject.tag == "Grabable")
+            {
+                hitObjectRot = hitObject.transform.rotation;
+                carry = true;
+            }
+        }
+
+
+
+    }
 }
